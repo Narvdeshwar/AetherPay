@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASSWORD: guest
+    ports:
+      - "5672:5672" # Yeh port humari Go microservices use karengi baat karne ke liye
+      - "15672:15672" # Yeh UI dashboard ke liye hai (Browser me dekhne ke liye)
+
+volumes:
+  postgres_data:
