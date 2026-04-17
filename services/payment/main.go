@@ -25,7 +25,7 @@ var db *gorm.DB
 func initDB() {
 	dsn := "host=localhost user=admin password=password123 dbname=postgres port=5432 sslmode=disable"
 	var err error
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect with db", err)
 	}
@@ -45,6 +45,22 @@ func main() {
 		txnId := "1x23fdfg"
 
 		// fmt.Printf("Processing the payment request of %s %.2f by the User: %s (%s)", req.Currency, req.Amount, req.Name, req.UserId)
+		newTxn := Transaction{
+			TransactionId: txnId,
+			UserId:        req.UserId,
+			Amount:        req.Amount,
+			Currency:      req.Currency,
+			Status:        "SUCCESS",
+		}
+
+		result := db.Create(&newTxn)
+
+		if result.Error != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Data doesn't strored in DB"})
+			return
+		}
+
+		log.Println("Transaction saved in database")
 		resp := shared.PaymentResponse{
 			TransactionId: txnId,
 			Status:        "SUCCESS",
