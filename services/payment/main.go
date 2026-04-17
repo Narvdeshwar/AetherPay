@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -61,6 +62,30 @@ func main() {
 		}
 
 		log.Println("Transaction saved in database")
+
+		// Rabbit MQ
+		go func() {
+			conn, err := amqp.Dial("amqp://guest:guest@localhost:5672")
+			if err == nil {
+				defer conn.Close()
+				ch, _ := conn.Channel()
+				defer ch.Close()
+				// JSON message jo hum bhejenge
+				msgBody := fmt.Sprintf(`{"user_id": "%s", "transaction_id": "%s", "event": "PAYMENT_SUCCESS"}`, req.UserId, txnId)
+				ch.Publish(
+					"",                    // Exchange
+					"email_notifications", // Routing key (Queue ka naam)
+					false,                 // Mandatory
+					false,                 // Immediate
+					amqp.Publishing{
+						ContentType: "application/json",
+						Body:        []byte(msgBody),
+					})
+				log.Println("🚀 Message sent to RabbitMQ!")
+			}else {
+				log.Println("⚠️ RabbitMQ connection failed:", err)
+			}
+		}()
 		resp := shared.PaymentResponse{
 			TransactionId: txnId,
 			Status:        "SUCCESS",
