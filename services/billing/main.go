@@ -19,6 +19,7 @@ func main() {
 			Name:     "Ashrith",
 			Amount:   2001.4,
 			Currency: "INR",
+			UserId:   "123",
 		}
 		// convert data in json
 		reqData, err := json.Marshal(paymentData)

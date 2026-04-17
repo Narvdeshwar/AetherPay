@@ -25,7 +25,7 @@ func main() {
 
 	// 3. Queue declare kro agr queue exits nhi krti hai to
 	q, err := ch.QueueDeclare(
-		"email_notification", // queue ka naam
+		"email_notifications", // queue ka naam
 		true,                 // Durable (RabbitMQ restart hone par bhi bachegi
 		false,                // Delete when unused
 		false,                // Exclusive
@@ -50,11 +50,10 @@ func main() {
 	if err != nil {
 		log.Fatal("Unable to read the messgae", err)
 	}
-
 	var forever chan struct{}
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message %d\n", d.Body)
+			log.Printf("Received a message %s\n", d.Body)
 			log.Printf("Sending Email to user... Done!\n")
 			log.Println("------------------------------------")
 		}
