@@ -18,5 +18,14 @@ services:
       - "5672:5672" # Yeh port humari Go microservices use karengi baat karne ke liye
       - "15672:15672" # Yeh UI dashboard ke liye hai (Browser me dekhne ke liye)
 
+  # 3.Zooker (kafka ka manager)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
 volumes:
   postgres_data:
