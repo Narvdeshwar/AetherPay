@@ -10,6 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgres/data
 
+  # 2. Rabbit MQ
   rabbitmq:
     image: rabbitmq:3-management
     environment:
@@ -27,6 +28,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+
+  # 4. 
 
 volumes:
   postgres_data:
