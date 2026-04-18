@@ -41,8 +41,21 @@ services:
       KAFKA_LISTENERS_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INNER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
     ports:
       - "9092:9092"
+
+  # 5. clickhouse
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8
+    ports:
+      - "8123:8123" # HTTP API Port
+      - "9000:9000" # HTTP API Port
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
 volumes:
   postgres_data:
+  clickhouse_data:
