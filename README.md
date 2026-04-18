@@ -1,11 +1,6 @@
 **AetherPay – A Scalable, Event-Driven Microservices Payment Gateway & Subscription Management SaaS Platform (built entirely in Golang)**
 
 
-
-This is **not** another basic e-commerce CRUD app or IoT/sensor project. It is a **fintech-grade, production-like system** that mimics real SaaS billing platforms (think Stripe + Chargebee backend). It handles high-throughput transactions, multi-tenancy, distributed transactions, real-time analytics, and background jobs — exactly the kind of complex, resilient system senior Go engineers are expected to have designed, deployed, and scaled in 3–5 years of experience.
-
-
-
 **High-Level Architecture Overview (MVP)**
 
 
