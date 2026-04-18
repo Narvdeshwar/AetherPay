@@ -2,12 +2,15 @@ package main
 
 import (
 	"aetherpay/shared"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/segmentio/kafka-go"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -63,7 +66,7 @@ func main() {
 
 		log.Println("Transaction saved in database")
 
-		// Rabbit MQ
+		// Rabbit MQ (Temporary Task - For Email)
 		go func() {
 			conn, err := amqp.Dial("amqp://guest:guest@localhost:5672")
 			if err == nil {
@@ -82,9 +85,38 @@ func main() {
 						Body:        []byte(msgBody),
 					})
 				log.Println("🚀 Message sent to RabbitMQ!")
-			}else {
+			} else {
 				log.Println("⚠️ RabbitMQ connection failed:", err)
 			}
+		}()
+
+		// Kafka (Permanent Ledger - For Analytics)
+		go func() {
+			writer := &kafka.Writer{
+				Addr:     kafka.TCP("localhost:9092"), // External port jo Docker mein set kiya tha
+				Topic:    "payment_events",              // Kafka ke folder/table ka naam
+				Balancer: &kafka.LeastBytes{},
+				AllowAutoTopicCreation: true,
+			}
+			defer writer.Close()
+
+			// json Data jo clickhouse read krega
+			kafkaMessage := fmt.Sprintf(`{"transaction_id": "%s", "user_id": "%s", "amount": %.2f, "currency": "%s", "status": "SUCCESS", "timestamp": "%s"}`,
+				txnId, req.UserId, req.Amount, req.Currency, time.Now().Format(time.RFC3339))
+
+			err := writer.WriteMessages(context.Background(),
+				kafka.Message{
+					Key:   []byte(txnId), // Key se Kafka decide karta hai data kahan rakhna hai
+					Value: []byte(kafkaMessage),
+
+				},
+			)
+			if err != nil {
+				log.Println("⚠️ Kafka connection failed:", err)
+			} else {
+				log.Println("📊 Event saved in Kafka Ledger (Analytics Ready)!")
+			}
+
 		}()
 		resp := shared.PaymentResponse{
 			TransactionId: txnId,
