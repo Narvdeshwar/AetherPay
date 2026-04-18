@@ -97,6 +97,7 @@ func main() {
 				Topic:    "payment_events",              // Kafka ke folder/table ka naam
 				Balancer: &kafka.LeastBytes{},
 				AllowAutoTopicCreation: true,
+				MaxAttempts:            3, // Retry mechanish if leadership is not available
 			}
 			defer writer.Close()
 
