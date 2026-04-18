@@ -29,6 +29,10 @@ run-notification:
 # par abhi ke liye hum manual run karenge.
 
 # 3. Database & Tools Shortcuts
+postgres:
+	@echo "🐘 Entering Postgres CLI..."
+	docker exec -it $$(docker ps -qf "name=postgres") psql -U admin -d postgres
+
 clickhouse:
 	docker exec -it $$(docker ps -qf "name=clickhouse") clickhouse-client
 
