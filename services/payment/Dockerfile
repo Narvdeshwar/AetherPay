@@ -1,26 +1,23 @@
 # 1. Build Stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
-# Working directory set karein
+# Pura project Docker mein daalein
 WORKDIR /app
-
-# Go modules copy karein aur download karein
-COPY go.mod go.sum ./
-RUN go mod download
-
-# Poora code copy karein
 COPY . .
 
-# Binary build karein (Isse 'payment-app' naam ki file banegi)
-RUN CGO_ENABLED=0 GOOS=linux go build -o payment-app main.go
+# Payment folder mein jayein
+WORKDIR /app/services/payment
 
-# 2. Final Stage (Choti image banane ke liye)
+# DIRECT BUILD (go mod download hata diya hai)
+# Binary ko direct /app folder mein save kar rahe hain taaki dhoondhne mein aasan ho
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/payment-app main.go
+
+# 2. Final Stage
 FROM alpine:latest
 WORKDIR /root/
+
+# Binary ko /app se copy karein
 COPY --from=builder /app/payment-app .
 
-# Port expose karein
 EXPOSE 3002
-
-# Application start karein
 CMD ["./payment-app"]

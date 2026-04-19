@@ -59,7 +59,9 @@ services:
 
   # 6. payment service
   payment-service:
-    build: ./services/payment
+    build:
+      context: . # you have now write to see all the folder
+      dockerfile: ./services/payment/Dockerfile
     ports:
       - "3002:3002"
     depends_on:
