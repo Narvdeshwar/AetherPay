@@ -27,7 +27,7 @@ func main() {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to convert into the json"})
 			return
 		}
-		paymentURL := "http://localhost:3002/api/v1/payment/process"
+		paymentURL := "http://payment-service:3002/api/v1/payment/process"
 		resp, err := http.Post(paymentURL, "application/json", bytes.NewBuffer(reqData))
 		log.Println("Current resposnc from payments", resp, err)
 		if err != nil {

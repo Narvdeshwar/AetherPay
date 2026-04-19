@@ -8,7 +8,7 @@ import (
 
 func main() {
 	// 1. Rabbitmq se connection setup krna
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
 		log.Fatal("Unable to connect with rabbitmq")
 		return
@@ -26,11 +26,11 @@ func main() {
 	// 3. Queue declare kro agr queue exits nhi krti hai to
 	q, err := ch.QueueDeclare(
 		"email_notifications", // queue ka naam
-		true,                 // Durable (RabbitMQ restart hone par bhi bachegi
-		false,                // Delete when unused
-		false,                // Exclusive
-		false,                // No wait
-		nil,                  // Arguments
+		true,                  // Durable (RabbitMQ restart hone par bhi bachegi
+		false,                 // Delete when unused
+		false,                 // Exclusive
+		false,                 // No wait
+		nil,                   // Arguments
 	)
 
 	if err != nil {

@@ -27,7 +27,7 @@ type Transaction struct {
 var db *gorm.DB
 
 func initDB() {
-	dsn := "host=localhost user=admin password=password123 dbname=postgres port=5432 sslmode=disable"
+	dsn := "host=postgres user=admin password=password123 dbname=postgres port=5432 sslmode=disable"
 	var err error
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -68,7 +68,7 @@ func main() {
 
 		// Rabbit MQ (Temporary Task - For Email)
 		go func() {
-			conn, err := amqp.Dial("amqp://guest:guest@localhost:5672")
+			conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672")
 			if err == nil {
 				defer conn.Close()
 				ch, _ := conn.Channel()
@@ -93,7 +93,7 @@ func main() {
 		// Kafka (Permanent Ledger - For Analytics)
 		go func() {
 			writer := &kafka.Writer{
-				Addr:     kafka.TCP("localhost:9092"), // External port jo Docker mein set kiya tha
+				Addr:     kafka.TCP("kafka:9092"), // External port jo Docker mein set kiya tha
 				Topic:    "payment_events",              // Kafka ke folder/table ka naam
 				Balancer: &kafka.LeastBytes{},
 				AllowAutoTopicCreation: true,
