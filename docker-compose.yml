@@ -56,6 +56,18 @@ services:
         hard: 262144
     volumes:
       - clickhouse_data:/var/lib/clickhouse
+
+  # 6. payment service
+  payment-service:
+    build: ./services/payment
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - kafka
+
+
 volumes:
   postgres_data:
   clickhouse_data:
