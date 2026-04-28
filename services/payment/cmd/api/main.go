@@ -67,7 +67,7 @@ func main() {
 				// JSON message jo hum bhejenge
 				msgBody := fmt.Sprintf(`{"user_id": "%s", "transaction_id": "%s", "event": "PAYMENT_SUCCESS"}`, req.UserId, txnId)
 				ch.Publish(
-					"",                    // Exchange
+					"",      	              // Exchange
 					"email_notifications", // Routing key (Queue ka naam)
 					false,                 // Mandatory
 					false,                 // Immediate
