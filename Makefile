@@ -10,8 +10,8 @@ setup:
 
 # 1. Infrastructure Commands
 up:
-	@echo "🚀 Starting infrastructure (Postgres, RabbitMQ, Kafka, ClickHouse)..."
-	$(DOCKER_COMPOSE) up -d
+	@echo "🚀 Starting infrastructure & building microservices..."
+	$(DOCKER_COMPOSE) up -d --build
 
 down:
 	@echo "🛑 Stopping all containers..."
@@ -19,16 +19,16 @@ down:
 
 # 2. Local Run Commands (Jab tak hum Dockerfiles nahi banate)
 run-payment:
-	@echo "💳 Running Payment Service..."
-	cd services/payment && $(GO) run main.go
+	@echo "💳 Running Payment Service locally..."
+	cd services/payment && $(GO) run cmd/api/main.go
 
 run-billing:
-	@echo "🧾 Running Billing Service..."
-	cd services/billing && $(GO) run main.go
+	@echo "🧾 Running Billing Service locally..."
+	cd services/billing && $(GO) run cmd/api/main.go
 
 run-notification:
-	@echo "🔔 Running Notification Service..."
-	cd services/notification && $(GO) run main.go
+	@echo "🔔 Running Notification Worker locally..."
+	cd services/notification && $(GO) run cmd/worker/main.go
 
 # Sab kuch ek sath chalane ke liye (Alag terminals ki zaroorat nahi padegi)
 # Note: Iske liye aapko 'air' ya 'concurrently' jaise tools chahiye honge,
