@@ -11,33 +11,32 @@ import (
 	"github.com/gin-gonic/gin"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/segmentio/kafka-go"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-type Transaction struct {
-	gorm.Model
-	TransactionId string
-	UserId        string
-	Amount        float64
-	Currency      string
-	Status        string
-}
+// type Transaction struct {
+// 	gorm.Model
+// 	TransactionId string
+// 	UserId        string
+// 	Amount        float64
+// 	Currency      string
+// 	Status        string
+// }
 
-var db *gorm.DB
+// var db *gorm.DB
 
-func initDB() {
-	dsn := "host=postgres user=admin password=password123 dbname=postgres port=5432 sslmode=disable"
-	var err error
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatal("Failed to connect with db", err)
-	}
-	db.AutoMigrate(&Transaction{})
-	fmt.Println("Database connected successfully and table created successfully!")
-}
+// func initDB() {
+// 	dsn := "host=postgres user=admin password=password123 dbname=postgres port=5432 sslmode=disable"
+// 	var err error
+// 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+// 	if err != nil {
+// 		log.Fatal("Failed to connect with db", err)
+// 	}
+// 	db.AutoMigrate(&Transaction{})
+// 	fmt.Println("Database connected successfully and table created successfully!")
+// }
 
 func main() {
+	// initDB()
 	initDB()
 	app := gin.Default()
 	app.POST("/api/v1/payment/process", func(c *gin.Context) {
@@ -93,9 +92,9 @@ func main() {
 		// Kafka (Permanent Ledger - For Analytics)
 		go func() {
 			writer := &kafka.Writer{
-				Addr:     kafka.TCP("kafka:9092"), // External port jo Docker mein set kiya tha
-				Topic:    "payment_events",              // Kafka ke folder/table ka naam
-				Balancer: &kafka.LeastBytes{},
+				Addr:                   kafka.TCP("kafka:9092"), // External port jo Docker mein set kiya tha
+				Topic:                  "payment_events",        // Kafka ke folder/table ka naam
+				Balancer:               &kafka.LeastBytes{},
 				AllowAutoTopicCreation: true,
 				MaxAttempts:            3, // Retry mechanish if leadership is not available
 			}
@@ -109,7 +108,6 @@ func main() {
 				kafka.Message{
 					Key:   []byte(txnId), // Key se Kafka decide karta hai data kahan rakhna hai
 					Value: []byte(kafkaMessage),
-
 				},
 			)
 			if err != nil {
