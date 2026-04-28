@@ -13,14 +13,6 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-// type Transaction struct {
-// 	gorm.Model
-// 	TransactionId string
-// 	UserId        string
-// 	Amount        float64
-// 	Currency      string
-// 	Status        string
-// }
 
 // var db *gorm.DB
 
@@ -48,7 +40,7 @@ func main() {
 		txnId := "1x23fdfg"
 
 		// fmt.Printf("Processing the payment request of %s %.2f by the User: %s (%s)", req.Currency, req.Amount, req.Name, req.UserId)
-		newTxn := Transaction{
+		newTxn := shared.Transaction{
 			TransactionId: txnId,
 			UserId:        req.UserId,
 			Amount:        req.Amount,
