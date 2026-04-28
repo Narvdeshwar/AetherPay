@@ -1,12 +1,11 @@
 package handlers
 
 import (
+	service "aetherpay/billing/internal/services"
 	"aetherpay/shared"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-    // Apne path ke hisab se module name daalein
-	"billing/internal/service"
 )
 
 type BillingHandler struct {
