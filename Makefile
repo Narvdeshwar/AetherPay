@@ -2,6 +2,12 @@
 DOCKER_COMPOSE = docker-compose
 GO = go
 
+# 0. Intial Setup for the project
+setup:
+	@echo "🔗 Linking modules and fixing imports..."
+	go work init ./shared ./services/payment ./services/notification ./services/billing
+	go mod tidy
+
 # 1. Infrastructure Commands
 up:
 	@echo "🚀 Starting infrastructure (Postgres, RabbitMQ, Kafka, ClickHouse)..."
