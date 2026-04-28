@@ -5,7 +5,6 @@ import (
 	"log"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	// Apne path ke hisab se module name daalein
 )
 
 type RabbitMQConsumer struct {
