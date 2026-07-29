@@ -11,7 +11,7 @@ type APIError struct {
 
 // Error implements the built-in error interface.
 func (e *APIError) Error() string {
-	return fmt.Sprintf("[%s] has an error: %d with message: [%s]",
+	return fmt.Sprintf("%s has an error -> %d with message-> %s",
 		e.Tenant,
 		e.Code,
 		e.Message,
