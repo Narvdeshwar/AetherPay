@@ -14,6 +14,7 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
+// GenerateJWT creates a short-lived access token with tenant isolation
 func GenerateJWT(userId, tenantId, role, secret string, duration time.Duration) (string, error) {
 	claims := CustomClaims{
 		UserId:   userId,
@@ -29,6 +30,7 @@ func GenerateJWT(userId, tenantId, role, secret string, duration time.Duration) 
 	return token.SignedString([]byte(secret))
 }
 
+// ValidateJWT verifies the token signature & extracts Claims without DB hit
 func ValidateJWT(tokenString, secret string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
