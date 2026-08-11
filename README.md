@@ -1,4 +1,4 @@
-# status : Dev Phase
+# Status : Dev Phase
 **AetherPay – A Scalable, Event-Driven Microservices Payment Gateway & Subscription Management SaaS Platform (built entirely in Golang)**
 
 
