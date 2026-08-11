@@ -9,7 +9,7 @@ import (
 )
 
 func InitDB() *gorm.DB {
-	dsn := "host=localhost user=postgres password=password dbname=aetherpay port=5432 sslmode=disable TimeZone=UTC"
+	dsn := "host=localhost user=postgres password=postgrespassword dbname=aetherpay port=5432 sslmode=disable TimeZone=UTC"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect with database:%v", err)
