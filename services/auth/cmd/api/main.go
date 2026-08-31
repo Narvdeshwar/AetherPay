@@ -3,13 +3,18 @@ package main
 import (
 	"log"
 
+	"github.com/AetherPay/services/auth/internal/config"
 	"github.com/AetherPay/services/auth/internal/handler"
+	"github.com/AetherPay/services/auth/internal/repository"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	db := config.InitDB()
+	merchantRepo = repository.NewMerchantRepository(db)
+	authHandler := handler.NewAuthHandler(merchantRepo)
+	
 	r := gin.Default()
-	authHandler := handler.NewAuthHandler()
 	v1 := r.Group("/api/v1/auth")
 	{
 		v1.POST("/login", authHandler.Login)
