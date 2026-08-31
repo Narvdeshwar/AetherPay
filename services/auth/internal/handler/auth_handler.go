@@ -4,16 +4,25 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/AetherPay/services/auth/internal/repository"
 	"github.com/Narvdeshwar/AetherPay/shared"
 	"github.com/gin-gonic/gin"
 )
 
 const JWT_SECRET_KEY = "super-secret-aether-key-2026"
 
-type AuthHandler struct{}
+type AuthHandler struct {
+	repo repository.MerchantRepository
+}
 
-func NewAuthHandler() *AuthHandler {
-	return &AuthHandler{}
+func NewAuthHandler(repo repository.MerchantRepository) *AuthHandler {
+	return &AuthHandler{repo: repo}
+}
+
+type RegisterRequest struct{
+	Email string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+	MerchantName string `json:"merchant_name" binding:"required"`
 }
 
 type LoginRequest struct {

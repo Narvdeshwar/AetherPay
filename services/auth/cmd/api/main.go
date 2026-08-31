@@ -11,9 +11,9 @@ import (
 
 func main() {
 	db := config.InitDB()
-	merchantRepo = repository.NewMerchantRepository(db)
+	merchantRepo:= repository.NewMerchantRepository(db)
 	authHandler := handler.NewAuthHandler(merchantRepo)
-	
+
 	r := gin.Default()
 	v1 := r.Group("/api/v1/auth")
 	{
