@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/config"
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/handler"
@@ -17,7 +16,7 @@ func main() {
 
 	merchantRepo := repository.NewMerchantRepository(db)
 
-	authHandler := handler.NewAuthHandler(merchantRepo, os.Getenv("JWT_SECRET"), 15)
+	authHandler := handler.NewAuthHandler(merchantRepo, cfg.JWTSecret, cfg.JWTExpiryMinutes)
 
 	r := gin.Default()
 	v1 := r.Group("/api/v1/auth")
@@ -26,7 +25,7 @@ func main() {
 		v1.POST("/login", authHandler.Login)
 	}
 	log.Println("auth Service is running on port 3001")
-	if err := r.Run(os.Getenv("AUTH_PORT")); err != nil {
+	if err := r.Run(cfg.AuthPort); err != nil {
 		log.Fatalf("Error running the auth server %v", err)
 	}
 

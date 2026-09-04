@@ -34,7 +34,7 @@ type LoginRequest struct {
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
-
+	
 }
 func (h *AuthHandler) Login(c *gin.Context) {
 
