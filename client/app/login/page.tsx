@@ -16,13 +16,13 @@ export default function Login() {
     <div className="w-screen h-screen flex justify-center items-center">
         <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Login to your account</CardTitle>
-        <CardDescription>
+        <CardTitle>Register to Aetherpay account</CardTitle>
+        {/* <CardDescription>
           Enter your email below to login to your account
-        </CardDescription>
-        <CardAction>
+        </CardDescription> */}
+        {/* <CardAction>
           <Button variant="link">Sign Up</Button>
-        </CardAction>
+        </CardAction> */}
       </CardHeader>
       <CardContent>
         <form>
