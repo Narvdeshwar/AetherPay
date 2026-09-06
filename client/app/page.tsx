@@ -1,6 +1,8 @@
+import { Button } from "@/components/ui/button"
+
 function Home(){
   return (
-    <>Test page</>
+    <Button>Test page</Button>
   )
 }
 
