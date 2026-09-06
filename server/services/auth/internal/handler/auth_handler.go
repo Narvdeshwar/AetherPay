@@ -1,10 +1,14 @@
 package handler
 
 import (
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/repository"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandler struct {
@@ -34,7 +38,36 @@ type LoginRequest struct {
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
-	
+	var req RegisterRequest
+	log.Println("Register request received", req)
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
+		return
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate the hashed password", "details": err.Error()})
+		return
+	}
+	merchantID := "mrc_" + uuid.NewString()
+	tenantID := "tn_" + uuid.NewString()
+	merchant := repository.Merchant{
+		ID:           merchantID,
+		TenantID:     tenantID,
+		MerchantName: req.MerchantName,
+		Email:        req.Email,
+		PasswordHash: string(hashedPassword),
+	}
+	if err := h.repo.Create(&merchant); err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Merchant with this email address is already registered", "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{
+		"message":     "Merchant Registered Successfully",
+		"tenant_id":   merchant.TenantID,
+		"merchant_id": merchant.ID,
+	})
 }
 func (h *AuthHandler) Login(c *gin.Context) {
 

@@ -37,7 +37,7 @@ func LoadConfig() *Config {
 		DBSSLMode:        os.Getenv("DB_SSLMODE"),
 		DBTimezone:       os.Getenv("DB_TIMEZONE"),
 		JWTSecret:        os.Getenv("JWT_SECRET"),
-		AuthPort:         os.Getenv("AuthPort"),
+		AuthPort:         os.Getenv("AUTH_PORT"),
 		JWTExpiryMinutes: jwtExpiryMinutes,
 	}
 }
