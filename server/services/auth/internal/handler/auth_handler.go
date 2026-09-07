@@ -96,4 +96,20 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"access_token": token, "tenant_id": merchant.TenantID, "expiry": int64(h.tokenTTL.Seconds())})
 }
 
+func (h *AuthHandler) Profile(c *gin.Context) {
+	// Go Concept: Type Assertion
+	// c.Get() generic 'any' return karta hai, string me convert karne ke liye .(string) use hota hai
+	tenantID, exits := c.Get("tenant_id")
+	if !exits {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Tenant context missing"})
+		return
+	}
+	userID, _ := c.Get("user_id")
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Access granted to protected resource!",
+		"tenant_id": tenantID,
+		"user_id":   userID,
+	})
+}
+
 //
