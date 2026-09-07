@@ -1,7 +1,6 @@
-package main
+package shared
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -27,12 +26,4 @@ func GenerateToken(userID, tenantID, role, secret string, duration time.Duration
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret))
-}
-
-func main() {
-	message, err := GenerateToken("rtest", "test", "admin", "usr", 2)
-	if err != nil {
-		fmt.Println("Error encountered")
-	}
-	fmt.Println("Token Generated:", message)
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/repository"
+	"github.com/Narvdeshwar/AetherPay/shared"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -70,5 +71,29 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	})
 }
 func (h *AuthHandler) Login(c *gin.Context) {
-
+	var req LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Fatalf("Invalid input: %v", err.Error())
+		return
+	}
+	// searching user in the merchant
+	merchant, err := h.repo.FindByEmail(req.Email)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		return
+	}
+	// check password
+	if err := bcrypt.CompareHashAndPassword([]byte(merchant.PasswordHash), []byte(req.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		return
+	}
+	// token generation and adding the tenant_id
+	token, err := shared.GenerateToken(merchant.ID, merchant.TenantID, "admin", h.jwtSecret, h.tokenTTL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error in generating the token", "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"access_token": token, "tenant_id": merchant.TenantID, "expiry": int64(h.tokenTTL.Seconds())})
 }
+
+//
