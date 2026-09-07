@@ -14,7 +14,7 @@ func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 		// Token absent hai toh yahi abort karo (Aage badhne nahi dena)
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missin"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
 			return
 		}
 		// 2. Format check: "Bearer <token>"
