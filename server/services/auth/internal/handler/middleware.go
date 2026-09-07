@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware(jwtSecret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 1. Request Header se 'Authorization' nikalo
 		authHeader := c.GetHeader("Authorization")
@@ -25,7 +25,7 @@ func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 		}
 		tokenString := parts[1]
 		// 3. Shared package se offline cryptographic validation
-		claims, err := shared.ValidateJWT(tokenString, h.jwtSecret)
+		claims, err := shared.ValidateJWT(tokenString, jwtSecret)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token", "details": err.Error()})
 			return

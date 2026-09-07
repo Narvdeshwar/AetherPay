@@ -19,10 +19,18 @@ func main() {
 	authHandler := handler.NewAuthHandler(merchantRepo, cfg.JWTSecret, cfg.JWTExpiryMinutes)
 
 	r := gin.Default()
-	v1 := r.Group("/api/v1/auth")
+	// public route
+	public := r.Group("/api/v1/auth")
 	{
-		v1.POST("/register", authHandler.Register)
-		v1.POST("/login", authHandler.Login)
+		public.POST("/register", authHandler.Register)
+		public.POST("/login", authHandler.Login)
+	}
+
+	// protected route
+	protected := r.Group("/api/v1/auth")
+	protected.Use(handler.AuthMiddleware(cfg.JWTSecret))
+	{
+		protected.GET("/profile", authHandler.Profile)
 	}
 	log.Println("auth Service is running on port 3001")
 	if err := r.Run(cfg.AuthPort); err != nil {
