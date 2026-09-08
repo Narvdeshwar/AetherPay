@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -40,7 +39,6 @@ type LoginRequest struct {
 
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req RegisterRequest
-	log.Println("Register request received", req)
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
@@ -105,10 +103,19 @@ func (h *AuthHandler) Profile(c *gin.Context) {
 		return
 	}
 	userID, _ := c.Get("user_id")
+	merchant, err := h.repo.FindByIdAndTenant(userID.(string), tenantID.(string))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user or tenant"})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"message":   "Access granted to protected resource!",
-		"tenant_id": tenantID,
-		"user_id":   userID,
+		"message":       "Access granted to protected resource!",
+		"tenant_id":     tenantID,
+		"user_id":       userID,
+		"email":         merchant.Email,
+		"merchant_name": merchant.MerchantName,
+		"created_at":    merchant.CreatedAt,
+		"updated_at":    merchant.UpdatedAt,
 	})
 }
 

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"log"
 	"time"
 
 	"gorm.io/gorm"
@@ -22,6 +23,7 @@ type Merchant struct {
 type MerchantRepository interface {
 	Create(m *Merchant) error
 	FindByEmail(email string) (*Merchant, error)
+	FindByIdAndTenant(userID, tenantID string) (*Merchant, error)
 }
 
 type merchantRepository struct {
@@ -44,4 +46,14 @@ func (r *merchantRepository) FindByEmail(email string) (*Merchant, error) {
 		return nil, err
 	}
 	return &m, nil
+}
+
+func (r *merchantRepository) FindByIdAndTenant(userID, tenantID string) (*Merchant, error) {
+	var merchant Merchant
+	err := r.db.Where("id=? AND tenant_id=?", userID, tenantID).First(&merchant).Error
+	if err != nil {
+		log.Println("Error the profile doesn't exits!", err.Error())
+		return nil, err
+	}
+	return &merchant, nil
 }
