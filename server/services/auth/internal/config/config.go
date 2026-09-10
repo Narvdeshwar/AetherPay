@@ -27,13 +27,14 @@ type Config struct {
 	RedisHost     string
 	RedisPort     string
 	RedisPassword string
-	RedisDB       int
+	RedisDB       string
 }
 
 func LoadConfig() *Config {
 	_ = godotenv.Load(".env")
 	// important to parse the time into the time.ParseDuration since we are expecting the time in the minutes
 	jwtExpiryMinutes, err := time.ParseDuration(os.Getenv("JWT_EXPIRY_MINUTES"))
+
 	if err != nil {
 		log.Fatalf("jwtsecret is not a number:%v", err)
 	}
@@ -48,5 +49,9 @@ func LoadConfig() *Config {
 		JWTSecret:        os.Getenv("JWT_SECRET"),
 		AuthPort:         os.Getenv("AUTH_PORT"),
 		JWTExpiryMinutes: jwtExpiryMinutes,
+		RedisHost:        os.Getenv("REDIS_HOST"),
+		RedisPort:        os.Getenv("REDIS_PORT"),
+		RedisPassword:    os.Getenv("REDIS_PASSWORD"),
+		RedisDB:          os.Getenv("REDIS_DB"),
 	}
 }
