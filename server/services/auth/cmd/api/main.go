@@ -15,6 +15,7 @@ func main() {
 
 	cfg := config.LoadConfig()
 	db := config.InitDB(cfg)
+	rdb := config.InitRedis(cfg)
 
 	merchantRepo := repository.NewMerchantRepository(db)
 
