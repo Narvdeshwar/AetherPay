@@ -5,6 +5,8 @@ import (
 
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/config"
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/handler"
+	"github.com/Narvdeshwar/AetherPay/services/auth/internal/middleware"
+
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -28,7 +30,7 @@ func main() {
 
 	// protected route
 	protected := r.Group("/api/v1/auth")
-	protected.Use(handler.AuthMiddleware(cfg.JWTSecret))
+	protected.Use(middleware.AuthMiddleware(cfg.JWTSecret))
 	{
 		protected.GET("/profile", authHandler.Profile)
 	}
