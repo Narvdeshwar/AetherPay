@@ -9,16 +9,25 @@ import (
 )
 
 type Config struct {
-	DBHost           string
-	DBUser           string
-	DBPassword       string
-	DBName           string
-	DBPort           string
-	DBSSLMode        string
-	DBTimezone       string
+	// postgresql
+	DBHost     string
+	DBUser     string
+	DBPassword string
+	DBName     string
+	DBPort     string
+	DBSSLMode  string
+	DBTimezone string
+
+	//JWT
 	JWTSecret        string
 	AuthPort         string
 	JWTExpiryMinutes time.Duration
+
+	// REDIS
+	RedisHost     string
+	RedisPort     string
+	RedisPassword string
+	RedisDB       int
 }
 
 func LoadConfig() *Config {
