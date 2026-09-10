@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	requestdto "github.com/Narvdeshwar/AetherPay/services/auth/internal/dto/request"
+	responsedto "github.com/Narvdeshwar/AetherPay/services/auth/internal/dto/response"
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/repository"
 	"github.com/Narvdeshwar/AetherPay/shared"
 	"github.com/gin-gonic/gin"
@@ -26,19 +28,8 @@ func NewAuthHandler(repo repository.MerchantRepository, jwtSecret string, tokenT
 	}
 }
 
-type RegisterRequest struct {
-	Email        string `json:"email" binding:"required,email"`
-	Password     string `json:"password" binding:"required,min=8"`
-	MerchantName string `json:"merchant_name" binding:"required,min=2,max=255"`
-}
-
-type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
-}
-
 func (h *AuthHandler) Register(c *gin.Context) {
-	var req RegisterRequest
+	var req requestdto.RegisterRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
@@ -62,14 +53,20 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		c.JSON(http.StatusConflict, gin.H{"error": "Merchant with this email address is already registered", "message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{
-		"message":     "Merchant Registered Successfully",
-		"tenant_id":   merchant.TenantID,
-		"merchant_id": merchant.ID,
-	})
+	res := responsedto.RegisterResponse{
+		MerchantResponse: responsedto.MerchantResponse{
+			MerchantID:   merchant.ID,
+			TenantID:     merchant.TenantID,
+			MerchantName: merchant.MerchantName,
+			Email:        merchant.Email,
+			CreatedAt:    merchant.CreatedAt,
+		},
+	}
+
+	c.JSON(http.StatusCreated, res)
 }
 func (h *AuthHandler) Login(c *gin.Context) {
-	var req LoginRequest
+	var req requestdto.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
