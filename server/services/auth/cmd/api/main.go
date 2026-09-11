@@ -24,6 +24,7 @@ func main() {
 	r := gin.Default()
 	// public route
 	public := r.Group("/api/v1/auth")
+	public.Use(middleware.RateLimiterMiddleware(rdb, int64(cfg.PublicRateLimit), cfg.PublicRateLimitTime))
 	{
 		public.POST("/register", authHandler.Register)
 		public.POST("/login", authHandler.Login)
@@ -32,6 +33,7 @@ func main() {
 	// protected route
 	protected := r.Group("/api/v1/auth")
 	protected.Use(middleware.AuthMiddleware(cfg.JWTSecret))
+	protected.Use(middleware.RateLimiterMiddleware(rdb, int64(cfg.ProtectedRateLimit), cfg.ProtectedRateLimitTime))
 	{
 		protected.GET("/profile", authHandler.Profile)
 	}
