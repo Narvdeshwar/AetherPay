@@ -21,6 +21,18 @@ services:
     volumes:
       - redis_data:/data
 
+  # 3. Envoy Edge API Gateway
+  envoy:
+    image: envoyproxy/envoy:v1.30-latest
+    container_name: aetherpay_envoy
+    restart: always
+    ports:
+      - "8000:8000" # Gateway access port
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # Linux/WSL network resolution bridge
+
 volumes:
   postgres_data:
   redis_data:
