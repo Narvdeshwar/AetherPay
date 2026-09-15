@@ -13,18 +13,21 @@ import (
 
 func main() {
 
-	cfg := config.LoadConfig()
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatalf("Error loding in env files:%v", err)
+	}
 	db := config.InitDB(cfg)
 	rdb := config.InitRedis(cfg)
 
 	merchantRepo := repository.NewMerchantRepository(db)
 
-	authHandler := handler.NewAuthHandler(merchantRepo, cfg.JWTSecret, cfg.JWTExpiryMinutes)
+	authHandler := handler.NewAuthHandler(merchantRepo, cfg.JWTSecret, cfg.JWTExpiry)
 
 	r := gin.Default()
 	// public route
 	public := r.Group("/api/v1/auth")
-	public.Use(middleware.RateLimiterMiddleware(rdb, int64(cfg.PublicRateLimit), cfg.PublicRateLimitTime))
+	public.Use(middleware.RateLimiterMiddleware(rdb, int64(cfg.RateLimit.PublicLimit), cfg.RateLimit.PublicWindow))
 	{
 		public.POST("/register", authHandler.Register)
 		public.POST("/login", authHandler.Login)
@@ -33,7 +36,7 @@ func main() {
 	// protected route
 	protected := r.Group("/api/v1/auth")
 	protected.Use(middleware.AuthMiddleware(cfg.JWTSecret))
-	protected.Use(middleware.RateLimiterMiddleware(rdb, int64(cfg.ProtectedRateLimit), cfg.ProtectedRateLimitTime))
+	protected.Use(middleware.RateLimiterMiddleware(rdb, int64(cfg.RateLimit.ProtectedLimit), cfg.RateLimit.ProtectedWindow))
 	{
 		protected.GET("/profile", authHandler.Profile)
 	}

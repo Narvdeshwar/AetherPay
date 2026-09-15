@@ -1,68 +1,103 @@
 package config
 
 import (
+	"log"
 	"time"
 
-	"github.com/joho/godotenv"
+	sharedconfig "github.com/Narvdeshwar/AetherPay/shared/config"
 )
 
 type Config struct {
-	// postgresql
-	DBHost     string
-	DBUser     string
-	DBPassword string
-	DBName     string
-	DBPort     string
-	DBSSLMode  string
-	DBTimezone string
+	// Common configurations
+	Postgres  sharedconfig.PostgresConfig
+	Redis     sharedconfig.RedisConfig
+	RateLimit sharedconfig.RateLimitConfig
 
-	//JWT
-	JWTSecret        string
-	AuthPort         string
-	JWTExpiryMinutes time.Duration
-
-	// REDIS
-	RedisHost     string
-	RedisPort     string
-	RedisPassword string
-	RedisDB       int
-
-	// Rate limit time
-	PublicRateLimit     int
-	PublicRateLimitTime time.Duration
-
-	ProtectedRateLimit     int
-	ProtectedRateLimitTime time.Duration
+	// Auth-specific configurations
+	JWTSecret string
+	AuthPort  string
+	JWTExpiry time.Duration
 }
 
-func LoadConfig() *Config {
-	_ = godotenv.Load(".env")
+func LoadConfig() (*Config, error) {
+	log.Print(sharedconfig.LoadDotEnv())
+	_ = sharedconfig.LoadDotEnv()
+
+	redisDB, err := sharedconfig.GetInt(
+		"REDIS_DB",
+		0,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	jwtExpiry, err := sharedconfig.GetDuration(
+		"JWT_EXPIRY",
+		15*time.Minute,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	publicLimit, err := sharedconfig.GetInt(
+		"PUBLIC_RATE_LIMIT",
+		5,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	publicWindow, err := sharedconfig.GetDuration(
+		"PUBLIC_RATE_LIMIT_WINDOW",
+		time.Minute,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	protectedLimit, err := sharedconfig.GetInt(
+		"PROTECTED_RATE_LIMIT",
+		10,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	protectedWindow, err := sharedconfig.GetDuration(
+		"PROTECTED_RATE_LIMIT_WINDOW",
+		time.Minute,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Config{
-		DBHost:     getEnv("HOST_ADDRESS", "db_key"),
-		DBUser:     getEnv("POSTGRES_USER", "db_user"),
-		DBPassword: getEnv("POSTGRES_PASSWORD", "postgre_pass"),
-		DBName:     getEnv("POSTGRES_DB", "db_name"),
-		DBPort:     getEnv("POSTGRES_PORT", "db_port"),
-		DBSSLMode:  getEnv("DB_SSLMODE", "db_ssl_mode"),
-		DBTimezone: getEnv("DB_TIMEZONE", "db_time_zone"),
+		Postgres: sharedconfig.PostgresConfig{
+			Host:     sharedconfig.GetEnv("DB_HOST", "localhost"),
+			User:     sharedconfig.GetEnv("DB_USER", "postgres"),
+			Password: sharedconfig.GetEnv("DB_PASSWORD", ""),
+			Name:     sharedconfig.GetEnv("DB_NAME", "aetherpay"),
+			Port:     sharedconfig.GetEnv("DB_PORT", "5433"),
+			SSLMode:  sharedconfig.GetEnv("DB_SSLMODE", "disable"),
+			Timezone: sharedconfig.GetEnv("DB_TIMEZONE", "UTC"),
+		},
 
-		// JWT
-		JWTSecret:        getEnv("JWT_SECRET", "jwt_secret"),
-		AuthPort:         getEnv("AUTH_PORT", "auth_port"),
-		JWTExpiryMinutes: getDuration("JWT_EXPIRY_MINUTES", "jwt_expiry"),
+		Redis: sharedconfig.RedisConfig{
+			Host:     sharedconfig.GetEnv("REDIS_HOST", "localhost"),
+			Port:     sharedconfig.GetEnv("REDIS_PORT", "6379"),
+			Password: sharedconfig.GetEnv("REDIS_PASSWORD", ""),
+			DB:       redisDB,
+		},
 
-		// Redis
-		RedisHost:     getEnv("REDIS_HOST", "redis_host"),
-		RedisPort:     getEnv("REDIS_PORT", "redis_port"),
-		RedisPassword: getEnv("REDIS_PASSWORD", "redis_password"),
-		RedisDB:       getInt("REDIS_DB", "redis_db"),
+		RateLimit: sharedconfig.RateLimitConfig{
+			PublicLimit:     publicLimit,
+			PublicWindow:    publicWindow,
+			ProtectedLimit:  protectedLimit,
+			ProtectedWindow: protectedWindow,
+		},
 
-		// Rate Limiting
-		PublicRateLimit:     getInt("PUBLIC_RATE_LIMIT", "public_rate_limit"),
-		PublicRateLimitTime: getDuration("PUBLIC_RATE_LIMIT_WINDOW", "public_rate_limit_window"),
-
-		ProtectedRateLimit:     getInt("PROTECTED_RATE_LIMIT", "protected_rate_limit"),
-		ProtectedRateLimitTime: getDuration("PROTECTED_RATE_LIMIT_WINDOW", "protected_rate_limit_window"),
-	}
+		JWTSecret: sharedconfig.GetEnv("JWT_SECRET", ""),
+		AuthPort:  sharedconfig.GetEnv("AUTH_PORT", "3001"),
+		JWTExpiry: jwtExpiry,
+	}, nil
 }
