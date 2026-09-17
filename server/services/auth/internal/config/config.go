@@ -1,7 +1,6 @@
 package config
 
 import (
-	"log"
 	"time"
 
 	sharedconfig "github.com/Narvdeshwar/AetherPay/shared/config"
@@ -20,7 +19,6 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	log.Print(sharedconfig.LoadDotEnv())
 	_ = sharedconfig.LoadDotEnv()
 
 	redisDB, err := sharedconfig.GetInt(
