@@ -5,8 +5,9 @@ import (
 )
 
 type Config struct {
-	Postgres sharedconfig.PostgresConfig
-	Redis    sharedconfig.RedisConfig
+	Postgres    sharedconfig.PostgresConfig
+	Redis       sharedconfig.RedisConfig
+	PaymentPort string
 }
 
 func LoadConfig() (*Config, error) {
@@ -26,5 +27,6 @@ func LoadConfig() (*Config, error) {
 			Host: sharedconfig.GetEnv("REDIS_HOST", "localhost"),
 			Port: sharedconfig.GetEnv("REDIS_PORT", "6379"),
 		},
+		PaymentPort: sharedconfig.GetEnv("PAYMENT_PORT", "3002"),
 	}, nil
 }

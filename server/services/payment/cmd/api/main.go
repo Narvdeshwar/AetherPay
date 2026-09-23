@@ -22,10 +22,14 @@ func main() {
 		log.Fatalf("failed to initialize Redis: %v", err)
 	}
 
-	payHandler := handler.NewPaymentHandler(paymentRepo, rdb)
+	paymentHandler := handler.NewPaymentHandler(paymentRepo, rdb)
 	r := gin.Default()
 
-	log.Println("auth Service is running on port 3001")
+	log.Println("auth Service is running on port 3002")
+	v1 := r.Group("/api/v1/payments")
+	{
+		v1.POST("", paymentHandler.ProcessPayment)
+	}
 	if err := r.Run(cfg.PaymentPort); err != nil {
 		log.Fatalf("Error running the auth server %v", err)
 	}
