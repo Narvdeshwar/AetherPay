@@ -95,7 +95,7 @@ func LoadConfig() (*Config, error) {
 		},
 
 		JWTSecret: sharedconfig.GetEnv("JWT_SECRET", ""),
-		AuthPort:  sharedconfig.GetEnv("AUTH_PORT", "3001"),
+		AuthPort:  sharedconfig.GetEnv("AUTH_PORT", "8001"),
 		JWTExpiry: jwtExpiry,
 	}, nil
 }

@@ -43,7 +43,7 @@ func main() {
 	{
 		protected.GET("/profile", authHandler.Profile)
 	}
-	log.Println("auth Service is running on port 3001")
+	log.Println("auth Service is running on port 8001")
 	if err := r.Run(cfg.AuthPort); err != nil {
 		log.Fatalf("Error running the auth server %v", err)
 	}

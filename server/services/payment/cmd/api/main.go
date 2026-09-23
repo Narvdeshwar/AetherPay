@@ -25,10 +25,10 @@ func main() {
 	paymentHandler := handler.NewPaymentHandler(paymentRepo, rdb)
 	r := gin.Default()
 
-	log.Println("auth Service is running on port 3002")
+	log.Println("auth Service is running on port 8002")
 	v1 := r.Group("/api/v1/payments")
 	{
-		v1.POST("", paymentHandler.ProcessPayment)
+		v1.POST("/process-payment", paymentHandler.ProcessPayment)
 	}
 	if err := r.Run(cfg.PaymentPort); err != nil {
 		log.Fatalf("Error running the auth server %v", err)

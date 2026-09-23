@@ -22,7 +22,7 @@ func (Payment) TableName() string {
 
 type PaymentRepository interface {
 	Create(payment *Payment) error
-	FindByIdempotencyKey(key string) (*Payment, error)
+	FindByIdempotencyKey(key, tenantID string) (*Payment, error)
 }
 
 type paymentRepository struct {
@@ -37,8 +37,24 @@ func (r *paymentRepository) Create(p *Payment) error {
 	return r.db.Create(p).Error
 }
 
-func (r *paymentRepository) FindByIdempotencyKey(key string) (*Payment, error) {
-	var p Payment
-	err := r.db.Where("idempotency_key = ?", key).First(&p).Error
-	return &p, err
+func (r *paymentRepository) FindByIdempotencyKey(
+	key string,
+	tenantID string,
+) (*Payment, error) {
+
+	var payment Payment
+
+	err := r.db.
+		Where(
+			"idempotency_key = ? AND tenant_id = ?",
+			key,
+			tenantID,
+		).
+		First(&payment).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &payment, nil
 }

@@ -1,45 +1,86 @@
 static_resources:
+
   listeners:
     - name: ingress_listener
       address:
         socket_address:
           address: 0.0.0.0
-          port_value: 8000 # External entry point
+          port_value: 8000
+
       filter_chains:
         - filters:
             - name: envoy.filters.network.http_connection_manager
               typed_config:
                 "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+
                 stat_prefix: ingress_http
+
                 route_config:
                   name: local_route
+
                   virtual_hosts:
                     - name: aetherpay_services
                       domains: ["*"]
+
                       routes:
-                        # Rule 1: Auth Service Route
+
                         - match:
                             prefix: "/api/v1/auth"
                           route:
                             cluster: auth_service_cluster
+
+                        - match:
+                            prefix: "/api/v1/payments"
+                          route:
+                            cluster: payment_service_cluster
+
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
+
   clusters:
-    # Target Cluster: Go Auth Service
+
+    # =========================
+    # Auth Service
+    # =========================
+
     - name: auth_service_cluster
       connect_timeout: 0.25s
       type: LOGICAL_DNS
       dns_lookup_family: V4_ONLY
       lb_policy: ROUND_ROBIN
+
       load_assignment:
         cluster_name: auth_service_cluster
+
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: host.docker.internal # Points to your laptop host
-                      port_value: 3001
+                      address: host.docker.internal
+                      port_value: 8001
+
+
+    # =========================
+    # Payment Service
+    # =========================
+
+    - name: payment_service_cluster
+      connect_timeout: 0.25s
+      type: LOGICAL_DNS
+      dns_lookup_family: V4_ONLY
+      lb_policy: ROUND_ROBIN
+
+      load_assignment:
+        cluster_name: payment_service_cluster
+
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: host.docker.internal
+                      port_value: 8002
