@@ -6,6 +6,7 @@ import (
 	"github.com/Narvdeshwar/AetherPay/services/payment/internal/config"
 	"github.com/Narvdeshwar/AetherPay/services/payment/internal/handler"
 	"github.com/Narvdeshwar/AetherPay/services/payment/internal/repository"
+	"github.com/Narvdeshwar/AetherPay/shared/database"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +17,12 @@ func main() {
 	}
 	db := config.InitDB(cfg)
 	paymentRepo := repository.NewPaymentRepository(db)
-	payHandler := handler.NewPaymentHandler(paymentRepo)
+	rdb, err := database.InitRedis(cfg.Redis)
+	if err != nil {
+		log.Fatalf("failed to initialize Redis: %v", err)
+	}
+
+	payHandler := handler.NewPaymentHandler(paymentRepo, rdb)
 	r := gin.Default()
 
 	log.Println("auth Service is running on port 3001")

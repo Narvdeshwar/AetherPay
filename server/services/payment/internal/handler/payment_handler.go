@@ -6,12 +6,18 @@ import (
 )
 
 type PaymentHandler struct {
-	repo repository.NewPaymentRepository
+	repo repository.PaymentRepository
 	rdb  *redis.Client
 }
 
-func NewPaymentHandler(repo repository.PaymentRepository) *PaymentHandler {
+func NewPaymentHandler(repo repository.PaymentRepository, rdb *redis.Client) *PaymentHandler {
 	return &PaymentHandler{
 		repo: repo,
+		rdb:  rdb,
 	}
+}
+
+type CreatePaymentRequest struct {
+	Amount   int64  `json:"amount" binding:"required,gt=0"`
+	Currency string `json:"currency", binding:"required"`
 }
