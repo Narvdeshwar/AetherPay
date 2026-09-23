@@ -6,6 +6,7 @@ import (
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/config"
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/handler"
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/middleware"
+	"github.com/Narvdeshwar/AetherPay/shared/database"
 
 	"github.com/Narvdeshwar/AetherPay/services/auth/internal/repository"
 	"github.com/gin-gonic/gin"
@@ -18,8 +19,10 @@ func main() {
 		log.Fatalf("Error loding in env files:%v", err)
 	}
 	db := config.InitDB(cfg)
-	rdb := config.InitRedis(cfg)
-
+	rdb, err := database.InitRedis(cfg.Redis)
+	if err != nil {
+		log.Fatalf("failed to initialize Redis: %v", err)
+	}
 	merchantRepo := repository.NewMerchantRepository(db)
 
 	authHandler := handler.NewAuthHandler(merchantRepo, cfg.JWTSecret, cfg.JWTExpiry)

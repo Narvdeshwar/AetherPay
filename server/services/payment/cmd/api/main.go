@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/Narvdeshwar/AetherPay/services/payment/internal/config"
+	"github.com/Narvdeshwar/AetherPay/services/payment/internal/handler"
 	"github.com/Narvdeshwar/AetherPay/services/payment/internal/repository"
 	"github.com/gin-gonic/gin"
 )
