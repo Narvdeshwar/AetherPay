@@ -33,6 +33,15 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway" # Linux/WSL network resolution bridge
 
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: aetherpay_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672" # AMQP protocol port (Go connects here)
+      - "15672:15672" # Web Dashboard (Browser login: guest / guest)
+
 volumes:
   postgres_data:
   redis_data:
